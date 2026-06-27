@@ -6,7 +6,7 @@ on:
 jobs:
   yayin:
     runs-on: ubuntu-latest
-    timeout-minutes: 360  # 6 saat - 3 yayın da bu sürede
+    timeout-minutes: 360  # 6 saat
     
     steps:
     - name: 📥 Depoyu klonla
@@ -34,45 +34,44 @@ jobs:
         RTMP_URL = "rtmp://s.catcast.tv/live"
         
         # ===================== YAYIN TANIMLARI =====================
-        # Her yayın için ayrı stream key ve video URL
         streams = [
             {
                 "name": "Yayın 1",
                 "stream_key": "mutluhub1?key=27610_50990_253571354411efe7",
-                "video_url": "https://cdn.codenet.work/streamgo/stremgo123/4864.m3u8"
+                "video_url": "https://cdn.codenet.work/streamgo/stremgo123/4864.m3u8",
+                "logo_url": "https://raw.githubusercontent.com/mutlumedya/yayin/refs/heads/main/logo.png"
             },
             {
                 "name": "Yayın 2",
                 "stream_key": "mutluhub2?key=27610_51345_4dfc219f0698977b",
-                "video_url": "https://cdn.codenet.work/streamgo/stremgo123/4865.m3u8"
+                "video_url": "https://cdn.codenet.work/streamgo/stremgo123/4865.m3u8",
+                "logo_url": "https://raw.githubusercontent.com/mutlumedya/yayin/refs/heads/main/logo1.png"
             },
             {
                 "name": "Yayın 3",
                 "stream_key": "mutluhub3?key=27610_51346_2ff24127a408da6c",
-                "video_url": "https://cdn.codenet.work/streamgo/stremgo123/4866.m3u8"
+                "video_url": "https://cdn.codenet.work/streamgo/stremgo123/4866.m3u8",
+                "logo_url": "https://raw.githubusercontent.com/mutlumedya/yayin/refs/heads/main/logo2.png"
             }
         ]
         
         # ===================== ORTAK AYARLAR =====================
-        LOGO_URL = "https://raw.githubusercontent.com/mutlumedya/yayin/refs/heads/main/logo.png"
         TEXT = "t.me/digitaltivi"
         FONT_SIZE = 24
         
         def start_stream(stream_config):
-            """Tek bir yayını başlat"""
             rtmp_server = f"{RTMP_URL}/{stream_config['stream_key']}"
             
             print(f"🎬 {stream_config['name']} başlatılıyor...")
             print(f"   Video: {stream_config['video_url']}")
-            print(f"   Stream Key: {stream_config['stream_key'][:20]}... (gizli)")
+            print(f"   Logo: {stream_config['logo_url']}")
             
-            # FFmpeg komutu
             command = [
                 'ffmpeg',
                 '-re',
                 '-stream_loop', '-1',
                 '-i', stream_config['video_url'],
-                '-i', LOGO_URL,
+                '-i', stream_config['logo_url'],
                 '-filter_complex',
                 '[0:v]scale=1280:720:force_original_aspect_ratio=decrease,pad=1280:720:(ow-iw)/2:(oh-ih)/2:black[v0];'
                 '[1:v]scale=250:80[logo];'
@@ -100,11 +99,9 @@ jobs:
                 print(f"\n⛔ {stream_config['name']} durduruluyor...")
                 proc.terminate()
         
-        # ===================== TÜM YAYINLARI BAŞLAT =====================
         print("=" * 50)
         print(f"📺 {len(streams)} Yayın Başlatılıyor")
         print("=" * 50)
-        print(f"🎨 Logo: {LOGO_URL}")
         print(f"📝 Alt yazı: {TEXT}")
         print("=" * 50)
         
