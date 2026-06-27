@@ -41,19 +41,19 @@ streams = [
         "name": "Yayın 1",
         "stream_key": "mutluhub1?key=27610_50990_253571354411efe7",
         "video_url": "https://cdn.codenet.work/streamgo/stremgo123/4864.m3u8",
-        "logo_url": "https://raw.githubusercontent.com/mutlumedya/yayin/refs/heads/main/logo.png"
+        "logo_url": "https://raw.githubusercontent.com/mutlumedya/yayin/refs/heads/main/logo1.png"
     },
     {
         "name": "Yayın 2",
         "stream_key": "mutluhub2?key=27610_51345_4dfc219f0698977b",
         "video_url": "https://cdn.codenet.work/streamgo/stremgo123/4865.m3u8",
-        "logo_url": "https://raw.githubusercontent.com/mutlumedya/yayin/refs/heads/main/logo1.png"
+        "logo_url": "https://raw.githubusercontent.com/mutlumedya/yayin/refs/heads/main/logo2.png"
     },
     {
         "name": "Yayın 3",
         "stream_key": "mutluhub3?key=27610_51346_2ff24127a408da6c",
         "video_url": "https://cdn.codenet.work/streamgo/stremgo123/4866.m3u8",
-        "logo_url": "https://raw.githubusercontent.com/mutlumedya/yayin/refs/heads/main/logo2.png"
+        "logo_url": "https://raw.githubusercontent.com/mutlumedya/yayin/refs/heads/main/logo3.png"
     }
 ]
 
