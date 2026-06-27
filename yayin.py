@@ -55,7 +55,7 @@ streams = [
 ]
 
 # ===================== ORTAK AYARLAR =====================
-LOGO_URL = "https://raw.githubusercontent.com/sahind01/yayin/refs/heads/main/logo.png"
+LOGO_URL = "https://raw.githubusercontent.com/mutlumedya/yayin/refs/heads/main/logo.png"
 TEXT = "t.me/digitaltivi"
 FONT_SIZE = 24
 
