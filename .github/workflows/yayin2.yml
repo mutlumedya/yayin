@@ -8,6 +8,7 @@ on:
 jobs:
   yayin:
     runs-on: ubuntu-latest
+    timeout-minutes: 360
     
     steps:
     - name: 📥 Depoyu klonla
@@ -43,7 +44,7 @@ jobs:
         print(f"🎨 Logo: {LOGO_URL}")
         print(f"🔑 Stream Key: {STREAM_KEY}")
         
-        # FFmpeg komutu - Logo SAĞ ÜSTTE (BÜYÜK)
+        # FFmpeg komutu
         command = [
             'ffmpeg',
             '-re',
@@ -52,7 +53,7 @@ jobs:
             '-i', LOGO_URL,
             '-filter_complex',
             '[0:v]scale=1280:720:force_original_aspect_ratio=decrease,pad=1280:720:(ow-iw)/2:(oh-ih)/2:black[v0];'
-            '[1:v]scale=250:80[logo];'  # 120'den 200'e çıkarıldı
+            '[1:v]scale=250:80[logo];'
             '[v0][logo]overlay=W-w-8:3[v1];'
             '[v1]drawtext=text=t.me/digitaltivi:fontcolor=white:fontsize=24:box=1:boxcolor=black@0.6:boxborderw=5:x=(w-text_w)/2:y=h-text_h-20[v]',
             '-map', '[v]',
@@ -67,7 +68,7 @@ jobs:
         ]
         
         print("\n🎥 Catcast.tv yayını başlatılıyor...")
-        print("🖼️  Logo: Sağ üst (200x200 - büyük)")
+        print("🖼️  Logo: Sağ üst")
         print("📝 Alt yazı: t.me/digitaltivi")
         print("⏸️  Durdurmak için: Ctrl + C\n")
         
@@ -89,5 +90,4 @@ jobs:
     - name: 🚀 Yayını başlat
       run: |
         echo "🎬 Yayın başlatılıyor..."
-        python yayin2.py
-      timeout-minutes: 360
+        python yayin.py
