@@ -44,12 +44,12 @@ streams = [
     },
     {
         "name": "Yayın 2",
-        "stream_key": "mutluhub2?key=27610_50991_253571354411efe8",  # Değiştir
+        "stream_key": "mutluhub2?key=27610_51345_4dfc219f0698977b",  # Değiştir
         "video_url": "https://cdn.codenet.work/streamgo/stremgo123/4865.m3u8"  # Değiştir
     },
     {
         "name": "Yayın 3",
-        "stream_key": "mutluhub3?key=27610_50992_253571354411efe9",  # Değiştir
+        "stream_key": "mutluhub3?key=27610_51346_2ff24127a408da6c",  # Değiştir
         "video_url": "https://cdn.codenet.work/streamgo/stremgo123/4866.m3u8"  # Değiştir
     }
 ]
