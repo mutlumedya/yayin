@@ -33,12 +33,12 @@ import threading
 
 # ===================== SSH101.com AYARLARI =====================
 RTMP_URL = "rtmp://ssh101.bozztv.com:1935/ssh101"
-STREAM_KEY = "mutlu1"
+STREAM_KEY = "zemtv"
 rtmp_server = f"{RTMP_URL}/{STREAM_KEY}"
 
 # ===================== YAYIN AYARLARI =====================
-VIDEO_URL = "https://cdn.codenet.work/streamgo/stremgo123/4865.m3u8"  # Değiştir!
-LOGO_URL = "https://raw.githubusercontent.com/mutlumedya/yayin/refs/heads/main/logo1.png"  # Değiştir!
+VIDEO_URL = "https://zemtv.mutlumedya.workers.dev/playlist.m3u8"  # Değiştir!
+LOGO_URL = "https://raw.githubusercontent.com/mutlumedya/yay-n-1/refs/heads/main/logo.png"  # Değiştir!
 
 print("=" * 50)
 print("📺 SSH101.com Yayın Başlatılıyor")
