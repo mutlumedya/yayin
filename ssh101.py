@@ -37,7 +37,7 @@ STREAM_KEY = "zemtv"
 rtmp_server = f"{RTMP_URL}/{STREAM_KEY}"
 
 # ===================== YAYIN AYARLARI =====================
-VIDEO_URL = "https://zemtv.mutlumedya.workers.dev/playlist.m3u8"  # Değiştir!
+VIDEO_URL = "https://catcast.ismailturret.workers.dev/playercinema-premium4.m3u8"  # Değiştir!
 LOGO_URL = "https://raw.githubusercontent.com/mutlumedya/yay-n-1/refs/heads/main/logo.png"  # Değiştir!
 
 print("=" * 50)
