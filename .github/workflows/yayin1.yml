@@ -1,4 +1,4 @@
-name: Catcast.tv Yayın 1
+name: SSH101.com 6 Yayın
 
 on:
   push:
@@ -31,18 +31,24 @@ jobs:
         import sys
         import time
         
-        # ===================== CATCAST AYARLARI =====================
-        RTMP_URL = "rtmp://s.catcast.tv/live"
-        STREAM_KEY = "mutluhub3?key=27610_51346_2ff24127a408da6c"
+        # ===================== SSH101.com AYARLARI =====================
+        RTMP_URL = "rtmp://ssh101.bozztv.com:1935/ssh101"
+        STREAM_KEY = "sadspor"
         rtmp_server = f"{RTMP_URL}/{STREAM_KEY}"
         
         # ===================== YAYIN AYARLARI =====================
-        VIDEO_URL = "https://cdn.codenet.work/streamgo/stremgo123/4864.m3u8"
-        LOGO_URL = "https://raw.githubusercontent.com/mutlumedya/yayin/refs/heads/main/logo2.png"
+        VIDEO_URL = "https://cdn.codenet.lol/streamgo/stremgo123/4866.m3u8"
+        LOGO_URL = "https://raw.githubusercontent.com/mutlumedya/yay-n-1/refs/heads/main/Photo.png"
         
-        print(f"🎬 Video Kaynağı: {VIDEO_URL}")
+        print("=" * 50)
+        print("📺 SSH101.com Yayın Başlatılıyor")
+        print("=" * 50)
+        print(f"🎬 Video: {VIDEO_URL}")
         print(f"🎨 Logo: {LOGO_URL}")
         print(f"🔑 Stream Key: {STREAM_KEY}")
+        print(f"📡 RTMP: {rtmp_server}")
+        print(f"🌐 İzleme: https://ssh101.com/live/{STREAM_KEY}")
+        print("=" * 50)
         
         command = [
             'ffmpeg',
@@ -52,8 +58,8 @@ jobs:
             '-i', LOGO_URL,
             '-filter_complex',
             '[0:v]scale=1280:720:force_original_aspect_ratio=decrease,pad=1280:720:(ow-iw)/2:(oh-ih)/2:black[v0];'
-            '[1:v]scale=250:80[logo];'
-            '[v0][logo]overlay=W-w-8:3[v1];'
+            '[1:v]scale=230:90[logo];'
+            '[v0][logo]overlay=W-w-10:3[v1];'
             '[v1]drawtext=text=t.me/digitaltivi:fontcolor=white:fontsize=24:box=1:boxcolor=black@0.6:boxborderw=5:x=(w-text_w)/2:y=h-text_h-20[v]',
             '-map', '[v]',
             '-map', '0:a?',
@@ -66,9 +72,7 @@ jobs:
             rtmp_server
         ]
         
-        print("\n🎥 Catcast.tv yayını başlatılıyor...")
-        print("🖼️  Logo: Sağ üst")
-        print("📝 Alt yazı: t.me/digitaltivi")
+        print("\n🎥 SSH101.com yayını başlatılıyor...")
         print("⏸️  Durdurmak için: Ctrl + C\n")
         
         try:
@@ -88,5 +92,5 @@ jobs:
     
     - name: 🚀 Yayını başlat
       run: |
-        echo "🎬 Yayın başlatılıyor..."
-        python yayin.py
+        echo "🎬 SSH101.com yayını başlatılıyor..."
+        python yayin6.py
