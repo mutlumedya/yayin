@@ -191,7 +191,7 @@ jobs:
     - name: 📋 M3U dosyasını kontrol et
       run: |
         echo "📋 M3U dosyası kontrol ediliyor..."
-        curl -s -L "https://raw.githubusercontent.com/sahind01/vidmoy/refs/heads/main/filmler/films.m3u" | head -20
+        curl -s -L "https://raw.githubusercontent.com/umitm0d/Liveinlive/refs/heads/main/filmmakinesi_tum.m3u" | head -20
         echo ""
         echo "✅ M3U kontrolü tamamlandı"
     
