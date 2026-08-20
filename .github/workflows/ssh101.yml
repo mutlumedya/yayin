@@ -19,10 +19,11 @@ jobs:
       with:
         python-version: '3.10'
     
-    - name: 📦 FFmpeg kurulumu
+    - name: 📦 FFmpeg ve bağımlılıklar kurulumu
       run: |
         sudo apt-get update
-        sudo apt-get install -y ffmpeg
+        sudo apt-get install -y ffmpeg python3-pip
+        pip3 install requests
     
     - name: 🎬 Yayın scriptini oluştur
       run: |
@@ -30,26 +31,94 @@ jobs:
         import subprocess
         import sys
         import time
-        
+        import requests
+        import re
+
         # ===================== SSH101.com AYARLARI =====================
         RTMP_URL = "rtmp://ssh101.bozztv.com:1935/ssh101"
         STREAM_KEY = "zemtv"
         rtmp_server = f"{RTMP_URL}/{STREAM_KEY}"
-        
+
         # ===================== YAYIN AYARLARI =====================
-        VIDEO_URL = "https://catcast.ismailturret.workers.dev/playercinema-premium4.m3u8"
+        M3U_URL = "https://raw.githubusercontent.com/sahind01/vidmoy/refs/heads/main/filmler/films.m3u"
         LOGO_URL = "https://raw.githubusercontent.com/mutlumedya/yay-n-1/refs/heads/main/logo.png"
-        
+
         print("=" * 50)
-        print("📺 SSH101.com Yayın Başlatılıyor")
+        print("📺 SSH101.com Yayın Başlatılıyor (M3U)")
         print("=" * 50)
-        print(f"🎬 Video: {VIDEO_URL}")
+        print(f"📋 M3U Kaynağı: {M3U_URL}")
         print(f"🎨 Logo: {LOGO_URL}")
         print(f"🔑 Stream Key: {STREAM_KEY}")
         print(f"📡 RTMP: {rtmp_server}")
         print(f"🌐 İzleme: https://ssh101.com/live/{STREAM_KEY}")
+        print(f"📱 HLS: https://lbgo.bozztv.com/ssh101/ssh101/{STREAM_KEY}/playlist.m3u8")
         print("=" * 50)
-        
+
+        def get_video_url_from_m3u(m3u_url):
+            """M3U dosyasından tüm video URL'lerini al ve ilk geçerli olanı döndür"""
+            try:
+                response = requests.get(m3u_url, timeout=15)
+                response.raise_for_status()
+                content = response.text
+                
+                lines = content.split('\n')
+                video_urls = []
+                
+                # M3U dosyasını parse et
+                for i, line in enumerate(lines):
+                    line = line.strip()
+                    
+                    # HTTP/HTTPS ile başlayan URL'leri bul
+                    if line.startswith(('http://', 'https://')):
+                        # Video uzantılarını kontrol et
+                        if any(ext in line.lower() for ext in ['.m3u8', '.ts', '.mp4', '.mkv', '.m3u']):
+                            video_urls.append(line)
+                
+                if video_urls:
+                    print(f"✅ {len(video_urls)} video URL'si bulundu.")
+                    # İlk URL'yi kullan
+                    selected_url = video_urls[0]
+                    print(f"📺 Seçilen video: {selected_url[:100]}...")
+                    return selected_url
+                
+                # Alternatif: #EXTINF satırlarından sonra gelen URL'leri bul
+                for i, line in enumerate(lines):
+                    if '#EXTINF' in line and i+1 < len(lines):
+                        next_line = lines[i+1].strip()
+                        if next_line.startswith(('http://', 'https://')):
+                            print(f"📺 EXTINF sonrası video bulundu: {next_line[:100]}...")
+                            return next_line
+                
+                return None
+                
+            except requests.exceptions.RequestException as e:
+                print(f"❌ M3U dosyası indirilemedi: {e}")
+                return None
+            except Exception as e:
+                print(f"❌ Beklenmeyen hata: {e}")
+                return None
+
+        # M3U dosyasından video URL'sini al
+        print("\n🔄 M3U dosyası taranıyor...")
+        VIDEO_URL = get_video_url_from_m3u(M3U_URL)
+
+        if not VIDEO_URL:
+            print("❌ Video URL bulunamadı! M3U dosyasını kontrol edin.")
+            print(f"🔗 M3U URL: {M3U_URL}")
+            print("\n📋 M3U içeriğinden örnek satırlar:")
+            try:
+                response = requests.get(M3U_URL, timeout=10)
+                lines = response.text.split('\n')[:10]
+                for line in lines:
+                    if line.strip():
+                        print(f"  {line[:150]}")
+            except:
+                pass
+            sys.exit(1)
+
+        print(f"🎬 Video: {VIDEO_URL}")
+
+        # FFmpeg komutu - Logo SAĞ ÜSTTE
         command = [
             'ffmpeg',
             '-re',
@@ -71,26 +140,66 @@ jobs:
             '-f', 'flv',
             rtmp_server
         ]
-        
+
         print("\n🎥 SSH101.com yayını başlatılıyor...")
+        print("🖼️  Logo: Sağ üst (230x90)")
+        print("📝 Alt yazı: t.me/zemmedya")
         print("⏸️  Durdurmak için: Ctrl + C\n")
-        
+
+        # Yayını başlat
+        proc = None
         try:
-            proc = subprocess.Popen(command)
+            proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            
+            # FFmpeg çıktısını canlı takip et
+            import threading
+            def print_output():
+                if proc:
+                    for line in proc.stderr:
+                        line_str = line.decode('utf-8', errors='ignore').strip()
+                        if 'frame=' in line_str or 'speed=' in line_str:
+                            print(f"\r{line_str[:120]}", end='', flush=True)
+                        elif 'error' in line_str.lower():
+                            print(f"\n⚠️ {line_str}")
+            
+            output_thread = threading.Thread(target=print_output, daemon=True)
+            output_thread.start()
+            
+            # Yayını canlı tut
             while True:
                 time.sleep(60)
                 if proc.poll() is not None:
-                    print("⚠️ Yayın durdu, yeniden başlatılıyor...")
-                    proc = subprocess.Popen(command)
+                    print("\n⚠️ Yayın durdu, yeniden başlatılıyor...")
+                    proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                    
         except KeyboardInterrupt:
             print("\n\n⛔ Yayın durduruluyor...")
-            proc.terminate()
+            if proc:
+                proc.terminate()
+                proc.wait()
             print("✅ Yayın sonlandırıldı.")
+        except Exception as e:
+            print(f"\n❌ Hata: {e}")
+            if proc:
+                proc.terminate()
+                proc.wait()
+            sys.exit(1)
         EOF
         
         echo "✅ Python scripti oluşturuldu"
     
+    - name: 📋 M3U dosyasını kontrol et
+      run: |
+        echo "📋 M3U dosyası kontrol ediliyor..."
+        curl -s -L "https://raw.githubusercontent.com/sahind01/vidmoy/refs/heads/main/filmler/films.m3u" | head -20
+        echo ""
+        echo "✅ M3U kontrolü tamamlandı"
+    
     - name: 🚀 Yayını başlat
       run: |
         echo "🎬 SSH101.com yayını başlatılıyor..."
+        echo "📡 RTMP: rtmp://ssh101.bozztv.com:1935/ssh101/zemtv"
+        echo "🌐 İzleme: https://ssh101.com/live/zemtv"
+        echo "📱 HLS: https://lbgo.bozztv.com/ssh101/ssh101/zemtv/playlist.m3u8"
+        echo ""
         python yayin.py
