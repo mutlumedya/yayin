@@ -40,7 +40,7 @@ rtmp_server = f"{RTMP_URL}/{STREAM_KEY}"
 
 # ===================== YAYIN AYARLARI =====================
 # M3U dosyası (kanal listesi)
-M3U_URL = "https://raw.githubusercontent.com/umitm0d/Liveinlive/refs/heads/main/jetfilm_tum.m3u"
+M3U_URL = "https://raw.githubusercontent.com/bayzero1905/msiptv/d5c2f1fc92a04b5f5556dbd33fc03ae29f6eb318/m3u/webtv.m3u"
 LOGO_URL = "https://raw.githubusercontent.com/mutlumedya/yay-n-1/refs/heads/main/logo.png"
 
 print("=" * 50)
