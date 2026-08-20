@@ -30,6 +30,8 @@ import subprocess
 import sys
 import time
 import threading
+import re
+import requests
 
 # ===================== SSH101.com AYARLARI =====================
 RTMP_URL = "rtmp://ssh101.bozztv.com:1935/ssh101"
@@ -37,19 +39,66 @@ STREAM_KEY = "zemtv"
 rtmp_server = f"{RTMP_URL}/{STREAM_KEY}"
 
 # ===================== YAYIN AYARLARI =====================
-VIDEO_URL = "https://catcast.ismailturret.workers.dev/playercinema-premium4.m3u8"  # Değiştir!
-LOGO_URL = "https://raw.githubusercontent.com/mutlumedya/yay-n-1/refs/heads/main/logo.png"  # Değiştir!
+# M3U dosyası (kanal listesi)
+M3U_URL = "https://raw.githubusercontent.com/sahind01/vidmoy/refs/heads/main/filmler/films.m3u"
+LOGO_URL = "https://raw.githubusercontent.com/mutlumedya/yay-n-1/refs/heads/main/logo.png"
 
 print("=" * 50)
 print("📺 SSH101.com Yayın Başlatılıyor")
 print("=" * 50)
-print(f"🎬 Video: {VIDEO_URL}")
+print(f"📋 M3U Kaynağı: {M3U_URL}")
 print(f"🎨 Logo: {LOGO_URL}")
 print(f"🔑 Stream Key: {STREAM_KEY}")
 print(f"📡 RTMP: {rtmp_server}")
 print(f"🌐 İzleme: https://ssh101.com/live/{STREAM_KEY}")
 print(f"📱 HLS: https://lbgo.bozztv.com/ssh101/ssh101/{STREAM_KEY}/playlist.m3u8")
 print("=" * 50)
+
+def get_video_url_from_m3u(m3u_url):
+    """M3U dosyasından ilk geçerli video URL'sini alır"""
+    try:
+        response = requests.get(m3u_url, timeout=10)
+        response.raise_for_status()
+        content = response.text
+        
+        # M3U formatını parse et
+        lines = content.split('\n')
+        video_urls = []
+        
+        for i, line in enumerate(lines):
+            line = line.strip()
+            # http veya https ile başlayan ve .m3u8, .ts, .mp4 uzantılı satırları bul
+            if line.startswith(('http://', 'https://')):
+                if any(ext in line.lower() for ext in ['.m3u8', '.ts', '.mp4', '.mkv']):
+                    video_urls.append(line)
+        
+        if video_urls:
+            print(f"✅ {len(video_urls)} video URL'si bulundu.")
+            print(f"📺 İlk video kullanılıyor: {video_urls[0][:80]}...")
+            return video_urls[0]
+        else:
+            # Alternatif: #EXTINF satırından sonra gelen URL'leri bul
+            for i, line in enumerate(lines):
+                if line.startswith('#EXTINF') and i+1 < len(lines):
+                    next_line = lines[i+1].strip()
+                    if next_line.startswith(('http://', 'https://')):
+                        print(f"📺 EXTINF sonrası video bulundu: {next_line[:80]}...")
+                        return next_line
+            return None
+            
+    except Exception as e:
+        print(f"❌ M3U dosyası okunamadı: {e}")
+        return None
+
+# M3U dosyasından video URL'sini al
+VIDEO_URL = get_video_url_from_m3u(M3U_URL)
+
+if not VIDEO_URL:
+    print("❌ Video URL bulunamadı! M3U dosyasını kontrol edin.")
+    print(f"🔗 M3U URL: {M3U_URL}")
+    sys.exit(1)
+
+print(f"\n🎬 Video: {VIDEO_URL}")
 
 # FFmpeg komutu - Logo SAĞ ÜSTTE
 command = [
@@ -62,7 +111,7 @@ command = [
     '[0:v]scale=1280:720:force_original_aspect_ratio=decrease,pad=1280:720:(ow-iw)/2:(oh-ih)/2:black[v0];'
     '[1:v]scale=230:90[logo];'
     '[v0][logo]overlay=W-w-10:3[v1];'
-    '[v1]drawtext=text=t.me/digitaltivi:fontcolor=white:fontsize=24:box=1:boxcolor=black@0.6:boxborderw=5:x=(w-text_w)/2:y=h-text_h-20[v]',
+    '[v1]drawtext=text=t.me/zemmedya:fontcolor=white:fontsize=24:box=1:boxcolor=black@0.6:boxborderw=5:x=(w-text_w)/2:y=h-text_h-20[v]',
     '-map', '[v]',
     '-map', '0:a?',
     '-c:v', 'libx264',
